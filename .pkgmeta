@@ -25,4 +25,4 @@ ignore:
     - Libs/LibSharedMedia-3.0/CallbackHandler-1.0
 
 move-folders:
-    - Libs/LibSharedMedia-3.0/LibSharedMedia-3.0: Libs/LibSharedMedia-3.0
+    - LibSharedMedia-3.0/LibSharedMedia-3.0: LibSharedMedia-3.0
