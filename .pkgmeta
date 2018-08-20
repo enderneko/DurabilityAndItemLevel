@@ -15,14 +15,9 @@ externals:
         url: https://repos.wowace.com/wow/libuidropdownmenu/trunk
         tag: latest
     Libs/LibSharedMedia-3.0:
-        url: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk
+        url: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
         tag: latest
 
 ignore:
     - Libs/LibStub/tests
     - Libs/LibItemUpgradeInfo-1.0/LibStub
-    - Libs/LibSharedMedia-3.0/LibStub
-    - Libs/LibSharedMedia-3.0/CallbackHandler-1.0
-
-move-folders:
-    - LibSharedMedia-3.0/LibSharedMedia-3.0: LibSharedMedia-3.0
