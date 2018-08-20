@@ -12,7 +12,7 @@ externals:
         url: git://git.wowace.com/wow/libitemupgradeinfo-1-0/mainline.git
         tag: latest
     Libs/LibUIDropDownMenu:
-        url: https://repos.wowace.com/wow/libuidropdownmenu/trunk
+        url: https://repos.wowace.com/wow/libuidropdownmenu/trunk/LibUIDropDownMenu
         tag: latest
     Libs/LibSharedMedia-3.0:
         url: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
