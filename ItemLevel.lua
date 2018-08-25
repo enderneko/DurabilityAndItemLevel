@@ -112,8 +112,8 @@ local function Update(id, itemLink, flyoutButton, flyoutButtonID, flyoutBag, fly
 				end
 				table.wipe(itemStats)
 				
-				-- weapon, wrist, finger
-				if tContains({9, 11, 12, 16}, id) or tContains({9, 11, 12, 16}, flyoutButtonID) then
+				-- weapon, hands, fingers
+				if tContains({10, 11, 12, 16}, id) or tContains({10, 11, 12, 16}, flyoutButtonID) then
 					local data = select(3, strsplit("|", itemLink))
 					local enchant = select(3, strsplit(":", data))
 					if enchant == "" then e = 0 end 
