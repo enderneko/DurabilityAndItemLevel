@@ -50,7 +50,7 @@ local function UpdateDur(slotID)
 	local s = GetSlotFontString(slotID)
 	if (v2 ~= 0) and (DurabilityAndItemLevel["alwaysShowDur"] or percent < 1) then	
 		s:SetTextColor(GetThresholdColor(percent))
-		s:SetText(ceil(percent * 100) .. "%")
+		s:SetText(math.floor(percent * 100) .. "%")
 	else
 		s:SetText("")
 	end
@@ -73,7 +73,7 @@ f:SetScript("OnEvent", function(self, event, arg1)
 		CharacterFrame:HookScript("OnShow", function()
 			f:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
 			f:RegisterEvent("UPDATE_INVENTORY_DURABILITY")
-			C_Timer.After(.2, function()
+			C_Timer.After(.1, function()
 				DAI:UpdateAllDur()
 			end)
 		end)
@@ -91,7 +91,7 @@ f:SetScript("OnEvent", function(self, event, arg1)
 
 	else -- UPDATE_INVENTORY_DURABILITY multi-fired
 		if timer then timer:Cancel() end
-		timer = C_Timer.NewTimer(.2, function()
+		timer = C_Timer.NewTimer(.1, function()
 			DAI:UpdateAllDur()
 		end)
 	end

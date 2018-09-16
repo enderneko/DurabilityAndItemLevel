@@ -170,14 +170,16 @@ f:SetScript("OnEvent", function(self, event, arg1)
 		f:UnregisterEvent("PLAYER_ENTERING_WORLD")
 		
 		CharacterFrame:HookScript("OnShow", function()
-			f:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
-			C_Timer.After(.2, function()
+			-- f:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
+			f:RegisterEvent("UNIT_INVENTORY_CHANGED")
+			C_Timer.After(.1, function()
 				DAI:UpdateAllIlvl()
 			end)
 		end)
 		
 		CharacterFrame:HookScript("OnHide", function()
-			f:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
+			-- f:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
+			f:UnregisterEvent("UNIT_INVENTORY_CHANGED")
 		end)
 
 		-- Interface\FrameXML\EquipmentFlyout.lua
@@ -185,9 +187,12 @@ f:SetScript("OnEvent", function(self, event, arg1)
 			UpdateFlyout(button)
 		end)
 
-	else -- PLAYER_EQUIPMENT_CHANGED
-		if slotIDs[arg1] then
-			Update(arg1, GetInventoryItemLink("player", arg1))
-		end
+	else -- PLAYER_EQUIPMENT_CHANGED or UNIT_INVENTORY_CHANGED
+		-- if slotIDs[arg1] then
+		-- 	Update(arg1, GetInventoryItemLink("player", arg1))
+		-- end
+		C_Timer.After(.1, function()
+			DAI:UpdateAllIlvl()
+		end)
 	end
 end)
