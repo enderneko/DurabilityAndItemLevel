@@ -97,9 +97,11 @@ local function Update(id, itemLink, flyoutButton, flyoutButtonID, flyoutBag, fly
 		
 		if iLevel then
 			-- local iQualityColor = select(4, GetItemQualityColor(GetInventoryItemQuality("player", id)))
-			local iQualityColor = string.sub(select(2, strsplit("|", itemLink)), 2)
+			-- local iQualityColor = string.sub(select(2, strsplit("|", itemLink)), 2)
+			-- itemId:enchantId:jewelId1:jewelId2:jewelId3:jewelId4:suffixId:uniqueId:linkLevel
+			local iQualityColor, itemString = itemLink:match("(|c%x+)|Hitem:([-%d:]+)|h%[.-%]|h|r")
 
-			s = "|c" .. iQualityColor .. iLevel .. "|r"
+			s = iQualityColor .. iLevel
 			
 			-- gem & enchant
 			if iLevel >= 300 then -- don't check old items
@@ -108,14 +110,14 @@ local function Update(id, itemLink, flyoutButton, flyoutButtonID, flyoutBag, fly
 				local e = 1
 			
 				if itemStats["EMPTY_SOCKET_PRISMATIC"] then -- has socket
-					if not(GetItemGem(itemLink, 1)) then g = 0 end
+					local gem = select(3, string.split(":", itemString))
+					if gem == "" then g = 0 end
 				end
 				table.wipe(itemStats)
 				
 				-- weapon, hands, fingers
 				if tContains({10, 11, 12, 16}, id) or tContains({10, 11, 12, 16}, flyoutButtonID) then
-					local data = select(3, strsplit("|", itemLink))
-					local enchant = select(3, strsplit(":", data))
+					local enchant = select(2, strsplit(":", itemString))
 					if enchant == "" then e = 0 end 
 				end
 			
@@ -191,8 +193,10 @@ f:SetScript("OnEvent", function(self, event, arg1)
 		-- if slotIDs[arg1] then
 		-- 	Update(arg1, GetInventoryItemLink("player", arg1))
 		-- end
-		C_Timer.After(.1, function()
-			DAI:UpdateAllIlvl()
-		end)
+		if arg1 == "player" then
+			C_Timer.After(.1, function()
+				DAI:UpdateAllIlvl()
+			end)
+		end
 	end
 end)
