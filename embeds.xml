@@ -4,5 +4,4 @@
 	<Include file="Libs\LibUIDropDownMenu\LibUIDropDownMenu.xml"/>
 	<Script file="Libs\LibSharedMedia-3.0\LibSharedMedia-3.0.lua"/>
 	<Script file="Libs\LibConfigPanel-1.0.lua"/>
-	<Script file="Libs\LibItemUpgradeInfo-1.0\Core.lua"/>
 </Ui>

@@ -8,9 +8,6 @@ externals:
     Libs/CallbackHandler-1.0:
         url: https://repos.wowace.com/wow/callbackhandler/trunk/CallbackHandler-1.0
         tag: latest
-    Libs/LibItemUpgradeInfo-1.0:
-        url: git://git.wowace.com/wow/libitemupgradeinfo-1-0/mainline.git
-        tag: latest
     Libs/LibUIDropDownMenu:
         url: https://repos.wowace.com/wow/libuidropdownmenu/trunk/LibUIDropDownMenu
         tag: latest
@@ -20,4 +17,3 @@ externals:
 
 ignore:
     - Libs/LibStub/tests
-    - Libs/LibItemUpgradeInfo-1.0/LibStub

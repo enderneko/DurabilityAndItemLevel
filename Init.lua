@@ -7,9 +7,11 @@ frame:SetScript("OnEvent", function(self, event, arg1, ...)
     if arg1 == addonName then
         if type(DurabilityAndItemLevel) ~= "table" then DurabilityAndItemLevel = {} end
         if type(DurabilityAndItemLevel["alwaysShowDur"]) ~= "boolean" then DurabilityAndItemLevel["alwaysShowDur"] = false end
-        if type(DurabilityAndItemLevel["forceTooltip"]) ~= "boolean" then DurabilityAndItemLevel["forceTooltip"] = false end
+        if type(DurabilityAndItemLevel["showInBags"]) ~= "boolean" then DurabilityAndItemLevel["showInBags"] = false end
+        if type(DurabilityAndItemLevel["iThreshold"]) ~= "number" then DurabilityAndItemLevel["iThreshold"] = 0 end
         if type(DurabilityAndItemLevel["durPoint"]) ~= "table" then DurabilityAndItemLevel["durPoint"] = {"BOTTOMRIGHT", 3, 0} end
         if type(DurabilityAndItemLevel["ilvlPoint"]) ~= "table" then DurabilityAndItemLevel["ilvlPoint"] = {"TOPLEFT", 0, 0} end
+        if type(DurabilityAndItemLevel["bagPoint"]) ~= "table" then DurabilityAndItemLevel["bagPoint"] = {"BOTTOMRIGHT", 0, 0} end
         if type(DurabilityAndItemLevel["font"]) ~= "table" then DurabilityAndItemLevel["font"] = {LSM:GetDefault("font"), 14, "OUTLINE"} end
     end
 end)

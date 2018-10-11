@@ -19,6 +19,13 @@ local function UpdateIlvlPoints()
     end
 end
 
+local function UpdateBagPoints()
+    for _, s in pairs(DAI.bagFontStrings) do
+        s:ClearAllPoints()
+		s:SetPoint(unpack(DurabilityAndItemLevel["bagPoint"]))
+    end
+end
+
 local function UpdateFont()
     local font = DAI:GetFont()
     for _, s in pairs(DAI.durFontStrings) do
@@ -44,12 +51,22 @@ DAIConfigPanel:SetScript("OnShow", function(self)
     local alwaysShowDurCB = LCP:CreateCheckButton(DAIConfigPanel, "Always Show Durability", "Even if dur is 100%.", DurabilityAndItemLevel, "alwaysShowDur", DAI.UpdateAllDur)
     alwaysShowDurCB:SetPoint("TOPLEFT", DAIConfigPanel.title, "BOTTOMLEFT", -2, -16)
 
-    local forceTooltipCB = LCP:CreateCheckButton(DAIConfigPanel, "Force Tooltip", "Always get itemLevel from tooltip, slow but accurate. \nIt works fine, but not recommended.", DurabilityAndItemLevel, "forceTooltip", DAI.UpdateAllIlvl)
-    forceTooltipCB:SetPoint("LEFT", alwaysShowDurCB, "RIGHT", 200, 0)
+    local showInBagsCB = LCP:CreateCheckButton(DAIConfigPanel, "Show Item Level In Bags", "Show iLevel on equippable items in bags/bank.", DurabilityAndItemLevel, "showInBags", DAI.UpdateAllBags)
+    showInBagsCB:SetPoint("LEFT", alwaysShowDurCB, "RIGHT", 200, 0)
 
+    -- font
+    local fontDropDown = LCP:CreateDropDown(DAIConfigPanel, "Font", LSM:List("font"), DurabilityAndItemLevel["font"], 1, UpdateFont)
+    fontDropDown:SetPoint("TOPLEFT", alwaysShowDurCB, "BOTTOMLEFT", -15, -40)
+    
+    local fontSize = LCP:CreateSlider(DAIConfigPanel, "Font Size", 6, 20, nil, DurabilityAndItemLevel["font"], 2, UpdateFont)
+    fontSize:SetPoint("LEFT", fontDropDown, "RIGHT", 130, 0)
+    
+    local fontFlagDropDown = LCP:CreateDropDown(DAIConfigPanel, "Font Flag", flags, DurabilityAndItemLevel["font"], 3, UpdateFont)
+    fontFlagDropDown:SetPoint("LEFT", fontSize, "RIGHT", 35, 0)
+    
     -- durbility
     local durPointDropDown = LCP:CreateDropDown(DAIConfigPanel, "Durability Point", points, DurabilityAndItemLevel["durPoint"], 1, UpdateDurPoints)
-    durPointDropDown:SetPoint("TOPLEFT", alwaysShowDurCB, "BOTTOMLEFT", -15, -40)
+    durPointDropDown:SetPoint("TOPLEFT", fontDropDown, "BOTTOMLEFT", 0, -50)
     
     local durPointX = LCP:CreateSlider(DAIConfigPanel, "Durability X", -16, 16, nil, DurabilityAndItemLevel["durPoint"], 2, UpdateDurPoints)
     durPointX:SetPoint("LEFT", durPointDropDown, "RIGHT", 130, 0)
@@ -66,14 +83,18 @@ DAIConfigPanel:SetScript("OnShow", function(self)
 
     local ilvlPointY = LCP:CreateSlider(DAIConfigPanel, "ItemLevel Y", -16, 16, nil, DurabilityAndItemLevel["ilvlPoint"], 3, UpdateIlvlPoints)
     ilvlPointY:SetPoint("LEFT", ilvlPointX, "RIGHT", 50, 0)
-    
-    -- font
-    local fontDropDown = LCP:CreateDropDown(DAIConfigPanel, "Font", LSM:List("font"), DurabilityAndItemLevel["font"], 1, UpdateFont)
-    fontDropDown:SetPoint("TOPLEFT", ilvlPointDropDown, "BOTTOMLEFT", 0, -40)
-    
-    local fontSize = LCP:CreateSlider(DAIConfigPanel, "Font Size", 6, 20, nil, DurabilityAndItemLevel["font"], 2, UpdateFont)
-    fontSize:SetPoint("LEFT", fontDropDown, "RIGHT", 130, 0)
-    
-    local fontFlagDropDown = LCP:CreateDropDown(DAIConfigPanel, "Font Flag", flags, DurabilityAndItemLevel["font"], 3, UpdateFont)
-    fontFlagDropDown:SetPoint("LEFT", fontSize, "RIGHT", 35, 0)
+
+    -- bag & bank
+    local bagPointDropDown = LCP:CreateDropDown(DAIConfigPanel, "Bag/Bank ItemLevel Point", points, DurabilityAndItemLevel["bagPoint"], 1, UpdateBagPoints)
+    bagPointDropDown:SetPoint("TOPLEFT", ilvlPointDropDown, "BOTTOMLEFT", 0, -40)
+
+    local bagPointX = LCP:CreateSlider(DAIConfigPanel, "X", -16, 16, nil, DurabilityAndItemLevel["bagPoint"], 2, UpdateBagPoints)
+    bagPointX:SetPoint("LEFT", bagPointDropDown, "RIGHT", 130, 0)
+
+    local bagPointY = LCP:CreateSlider(DAIConfigPanel, "Y", -16, 16, nil, DurabilityAndItemLevel["bagPoint"], 3, UpdateBagPoints)
+    bagPointY:SetPoint("LEFT", bagPointX, "RIGHT", 50, 0)
+
+    local iThreshold = LCP:CreateSlider(DAIConfigPanel, "iLevel Threshold", 0, 300, nil, DurabilityAndItemLevel, "iThreshold")
+    iThreshold:SetValueStep(10)
+    iThreshold:SetPoint("TOPLEFT", bagPointDropDown, "BOTTOMLEFT", 20, -40)
 end)

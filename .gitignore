@@ -2,7 +2,6 @@
 
 #external libraries
 LibSharedMedia-3.0/
-LibItemUpgradeInfo-1.0/
 LibUIDropDownMenu/
 CallbackHandler-1.0/
 LibStub/
