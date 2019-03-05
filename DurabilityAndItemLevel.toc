@@ -1,4 +1,4 @@
-## Interface: 80000
+## Interface: 80100
 ## Title: Durability And ItemLevel
 ## Notes: Minimalist durability and item level on each slot in character frame.
 ## Notes-zhCN: 角色面板耐久度&物品等级显示
