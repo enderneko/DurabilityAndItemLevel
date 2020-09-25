@@ -83,7 +83,7 @@ end)
 
 -- bagnon
 if IsAddOnLoaded("Bagnon") then
-	hooksecurefunc(Bagnon.ItemSlot, "Update", function(self)
+	hooksecurefunc(Bagnon.Item, "Update", function(self)
 		UpdateButton(self, self:GetBag(), self:GetID())
 	end)
 end
