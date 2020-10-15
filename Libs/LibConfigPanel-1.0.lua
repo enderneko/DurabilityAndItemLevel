@@ -96,7 +96,7 @@ end
 -- valueChangedFunc: excute on value changed
 -- valueFunc: process value into a specific format
 function lib:CreateDropDown(panel, label, values, configTable, configKey, valueChangedFunc, valueFunc)
-	local dropdown = CreateFrame("Frame", panel.name .. "ConfigDropDown_" .. label, panel, LCP_UIDropDownMenuTemplate)
+	local dropdown = L_Create_UIDropDownMenu(panel.name .. "ConfigDropDown_" .. label, panel)
 	-- dropdown:SetWidth(200)
 	local dropdownLabel = dropdown:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 	dropdownLabel:SetPoint("BOTTOMLEFT", dropdown, "TOPLEFT", 16, 3)
