@@ -8,6 +8,8 @@ local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
 
+local LDD = LibStub:GetLibrary("LibUIDropDownMenu-4.0")
+
 -----------------------------------------------
 -- CheckButton
 -----------------------------------------------
@@ -83,20 +85,10 @@ end
 -----------------------------------------------
 -- Dropdown
 -----------------------------------------------
-local LCP_UIDropDownMenu_SetSelectedValue, LCP_UIDropDownMenu_GetSelectedValue, LCP_UIDropDownMenu_CreateInfo, LCP_UIDropDownMenu_AddButton, LCP_UIDropDownMenu_Initialize, LCP_UIDropDownMenuTemplate
-local function InitializeDropdown()
-	LCP_UIDropDownMenu_SetSelectedValue = L_UIDropDownMenu_SetSelectedValue or UIDropDownMenu_SetSelectedValue
-	LCP_UIDropDownMenu_GetSelectedValue = L_UIDropDownMenu_GetSelectedValue or UIDropDownMenu_GetSelectedValue
-	LCP_UIDropDownMenu_CreateInfo = L_UIDropDownMenu_CreateInfo or UIDropDownMenu_CreateInfo
-	LCP_UIDropDownMenu_AddButton = L_UIDropDownMenu_AddButton or UIDropDownMenu_AddButton
-	LCP_UIDropDownMenu_Initialize = L_UIDropDownMenu_Initialize or UIDropDownMenu_Initialize
-	LCP_UIDropDownMenuTemplate = L_UIDropDownMenu_Initialize and "L_UIDropDownMenuTemplate" or "UIDropDownMenuTemplate"
-end
-
 -- valueChangedFunc: excute on value changed
 -- valueFunc: process value into a specific format
 function lib:CreateDropDown(panel, label, values, configTable, configKey, valueChangedFunc, valueFunc)
-	local dropdown = L_Create_UIDropDownMenu(panel.name .. "ConfigDropDown_" .. label, panel)
+	local dropdown = LDD:Create_UIDropDownMenu(panel.name .. "ConfigDropDown_" .. label, panel)
 	-- dropdown:SetWidth(200)
 	local dropdownLabel = dropdown:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 	dropdownLabel:SetPoint("BOTTOMLEFT", dropdown, "TOPLEFT", 16, 3)
@@ -109,11 +101,11 @@ function lib:CreateDropDown(panel, label, values, configTable, configKey, valueC
 		_G[dropdown:GetName().."Text"]:SetWidth(_G[dropdown:GetName().."Middle"]:GetWidth()-20)
 	end
 	
-	LCP_UIDropDownMenu_Initialize(dropdown, function()
-		local info = LCP_UIDropDownMenu_CreateInfo()
+	LDD:UIDropDownMenu_Initialize(dropdown, function()
+		local info = LDD:UIDropDownMenu_CreateInfo()
 		info.func = function(self)
 			configTable[configKey] = self.value
-			LCP_UIDropDownMenu_SetSelectedValue(dropdown, self.value)
+			LDD:UIDropDownMenu_SetSelectedValue(dropdown, self.value)
 			if valueChangedFunc then valueChangedFunc(self.value) end
 		end
 
@@ -126,10 +118,10 @@ function lib:CreateDropDown(panel, label, values, configTable, configKey, valueC
 			else
 				info.checked = nil
 			end
-			LCP_UIDropDownMenu_AddButton(info)
+			LDD:UIDropDownMenu_AddButton(info)
 		end
 	end)
-	LCP_UIDropDownMenu_SetSelectedValue(dropdown, configTable[configKey])
+	LDD:UIDropDownMenu_SetSelectedValue(dropdown, configTable[configKey])
 
 	return dropdown
 end
@@ -160,7 +152,6 @@ end
 -- end
 
 function lib:CreateConfigPanel(addonName)
-	InitializeDropdown()
 	local panel = CreateFrame("Frame")
 	panel.name = addonName
 	-- panel.okay = Panel_OnSave
