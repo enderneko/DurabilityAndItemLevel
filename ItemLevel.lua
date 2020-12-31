@@ -83,7 +83,7 @@ function DAI:GetItemInfo(itemLink, iLevel, checkEnchant)
 	local s = iQualityColor .. iLevel
 			
 	-- gem & enchant
-	if iLevel >= 300 then -- don't check old items
+	if iLevel >= 171 then -- don't check old items
 		local itemStats = GetItemStats(itemLink)
 		local g = 1
 		local e = 1
@@ -141,8 +141,8 @@ local function Update(slotID, itemLink, flyoutButton, flyoutButtonID, flyoutBag,
 		
 		if iLevel then
 			local checkEnchant = false
-			-- mainhand, hands, fingers
-			if tContains({10, 11, 12, 16}, slotID) or tContains({10, 11, 12, 16}, flyoutButtonID) then
+			-- feet, wrist, hands, fingers, back, mainhand
+			if tContains({8, 9, 10, 11, 12, 15, 16}, slotID) or tContains({8, 9, 10, 11, 12, 15, 16}, flyoutButtonID) then
 				checkEnchant = true
 			elseif slotID == 17 or flyoutButtonID == 17 then -- offhand
 				local itemEquipLoc = select(4, GetItemInfoInstant(itemLink))
