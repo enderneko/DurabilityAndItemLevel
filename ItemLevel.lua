@@ -26,6 +26,92 @@ local slotIDs = { -- http://wowprogramming.com/docs/api_types#inventoryID
 	[17] = "SecondaryHandSlot"
 }
 
+-- local specEnchantSlots = {
+--     -- 250 - Death Knight: Blood
+--     [250] = {},
+--     -- 251 - Death Knight: Frost
+--     [251] = {},
+--     -- 252 - Death Knight: Unholy
+--     [252] = {},
+
+--     -- 577 - Demon Hunter: Havoc
+--     [577] = {},
+--     -- 581 - Demon Hunter: Vengeance
+--     [581] = {},
+
+--     -- 102 - Druid: Balance
+--     [102] = {},
+--     -- 103 - Druid: Feral
+--     [103] = {},
+--     -- 104 - Druid: Guardian
+--     [104] = {},
+--     -- Druid: Restoration
+--     [105] = {},
+
+--     -- 253 - Hunter: Beast Mastery
+--     [253] = {},
+--     -- 254 - Hunter: Marksmanship
+--     [254] = {},
+--     -- 255 - Hunter: Survival
+--     [255] = {},
+
+--     -- 62 - Mage: Arcane
+--     [62] = {},
+--     -- 63 - Mage: Fire
+--     [63] = {},
+--     -- 64 - Mage: Frost
+--     [64] = {},
+
+--     -- 268 - Monk: Brewmaster
+--     [268] = {},
+--     -- 269 - Monk: Windwalker
+--     [269] = {},
+--     -- 270 - Monk: Mistweaver
+--     [270] = {},
+
+--     -- 65 - Paladin: Holy
+--     [65] = {},
+--     -- 66 - Paladin: Protection
+--     [66] = {},
+--     -- 70 - Paladin: Retribution
+--     [70] = {},
+
+--     -- 256 - Priest: Discipline
+--     [256] = {},
+--     -- 257 - Priest: Holy
+--     [257] = {},
+--     -- 258 - Priest: Shadow
+--     [258] = {},
+
+--     -- 259 - Rogue: Assassination
+--     [259] = {},
+--     -- 260 - Rogue: Outlaw
+--     [260] = {},
+--     -- 261 - Rogue: Subtlety
+--     [261] = {},
+
+--     -- 262 - Shaman: Elemental
+--     [262] = {},
+--     -- 263 - Shaman: Enhancement
+--     [263] = {},
+--     -- 264 - Shaman: Restoration
+--     [264] = {},
+
+--     -- 265 - Warlock: Affliction
+--     [265] = {},
+--     -- 266 - Warlock: Demonology
+--     [266] = {},
+--     -- 267 - Warlock: Destruction
+--     [267] = {},
+
+--     -- 71 - Warrior: Arms
+--     [71] = {},
+--     -- 72 - Warrior: Fury
+--     [72] = {},
+--     -- 73 - Warrior: Protection
+--     [73] = {},
+-- }
+
 local function GetSlotFontString(id, slot)
 	if(not slotFontStrings[id]) then
 		if not slot then -- not flyout button
@@ -112,6 +198,7 @@ function DAI:GetItemInfo(itemLink, iLevel, checkEnchant)
 	return s
 end
 
+local requireGatheringEnchant, isPrimaryStatStrength
 local function Update(slotID, itemLink, flyoutButton, flyoutButtonID, flyoutBag, flyoutSlot)
 	local slotFontString = GetSlotFontString(slotID, flyoutButton)
 	
@@ -141,8 +228,14 @@ local function Update(slotID, itemLink, flyoutButton, flyoutButtonID, flyoutBag,
 		
 		if iLevel then
 			local checkEnchant = false
-			-- feet, wrist, hands, fingers, back, mainhand
-			if tContains({8, 9, 10, 11, 12, 15, 16}, slotID) or tContains({8, 9, 10, 11, 12, 15, 16}, flyoutButtonID) then
+			local slots
+			if requireGatheringEnchant or isPrimaryStatStrength then
+				slots = {5, 8, 9, 10, 11, 12, 15, 16} -- chest, feet, wrist, hands, fingers, back, mainhand
+			else
+				slots = {5, 8, 9, 11, 12, 15, 16} -- chest, feet, wrist, fingers, back, mainhand
+			end
+			
+			if tContains(slots, slotID) or tContains(slots, flyoutButtonID) then
 				checkEnchant = true
 			elseif slotID == 17 or flyoutButtonID == 17 then -- offhand
 				local itemEquipLoc = select(4, GetItemInfoInstant(itemLink))
@@ -181,13 +274,37 @@ function DAI:UpdateAllIlvl()
 	end
 end
 
+local function UpdateProfessions()
+	local prof1, prof2 = GetProfessions()
+	if prof1 then
+		prof1 = select(7, GetProfessionInfo(prof1))
+		prof1 = (prof1 == 182) or (prof1 == 186) or (prof1 == 393)
+	end
+	if prof2 then
+		prof2 = select(7, GetProfessionInfo(prof2))
+		prof2 = (prof2 == 182) or (prof2 == 186) or (prof2 == 393)
+	end
+	requireGatheringEnchant = prof1 or prof2
+end
+
+local function UpdatePrimaryStat()
+	-- Spec's primary stat, as listed in SPEC_STAT_STRINGS[1] global. 1 - Strength, 2 - Agility, 4 - Intellect.
+	local primaryStat = select(6, GetSpecializationInfo(GetSpecialization()))
+	isPrimaryStatStrength = primaryStat == 1
+end
+
 local f = CreateFrame("Frame")
 f:RegisterEvent("PLAYER_ENTERING_WORLD")
+f:RegisterEvent("SKILL_LINES_CHANGED")
+f:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 
 f:SetScript("OnEvent", function(self, event, arg1)
 	if event == "PLAYER_ENTERING_WORLD" then
 		f:UnregisterEvent("PLAYER_ENTERING_WORLD")
 		
+		UpdateProfessions()
+		UpdatePrimaryStat()
+
 		CharacterFrame:HookScript("OnShow", function()
 			f:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
 			f:RegisterEvent("UNIT_INVENTORY_CHANGED")
@@ -206,13 +323,19 @@ f:SetScript("OnEvent", function(self, event, arg1)
 			UpdateFlyout(button)
 		end)
 
-	elseif event == "UNIT_INVENTORY_CHANGED" then -- UNIT_INVENTORY_CHANGED
+	elseif event == "SKILL_LINES_CHANGED" then
+		UpdateProfessions()
+
+	elseif event == "ACTIVE_TALENT_GROUP_CHANGED" then
+		UpdatePrimaryStat()
+
+	elseif event == "UNIT_INVENTORY_CHANGED" then
 		if arg1 == "player" then
 			C_Timer.After(.1, function()
 				DAI:UpdateAllIlvl()
 			end)
 		end
-	else -- PLAYER_EQUIPMENT_CHANGED
+	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
 		if slotIDs[arg1] then
 			Update(arg1, GetInventoryItemLink("player", arg1))
 		end
