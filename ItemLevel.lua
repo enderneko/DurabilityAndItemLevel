@@ -164,7 +164,7 @@ function DAI:GetItemInfo(itemLink, iLevel, checkEnchant)
 	-- local iQualityColor = select(4, GetItemQualityColor(GetInventoryItemQuality("player", slotID)))
 	-- https://wowpedia.fandom.com/wiki/ItemLink
 	-- item : itemID : enchantID : gemID1 : gemID2 : gemID3 : gemID4 : suffixID : uniqueID : linkLevel : specializationID : modifiersMask : itemContext : numBonusIDs[:bonusID1:bonusID2:...] : numModifiers[:modifierType1:modifierValue1:...] : relic1NumBonusIDs[:relicBonusID1:relicBonusID2:...] : relic2NumBonusIDs[...] : relic3NumBonusIDs[...] : crafterGUID : extraEnchantID
-	local iQualityColor, itemString = itemLink:match("(|c%w+)|Hitem:(.+):|h%[.*%]|h|r")
+	local iQualityColor, itemString = itemLink:match("(|c%w+)|Hitem:(.+)|h%[.*%]|h|r")
 
 	local s = iQualityColor .. iLevel
 			
