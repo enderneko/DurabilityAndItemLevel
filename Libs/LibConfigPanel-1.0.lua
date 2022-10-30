@@ -8,8 +8,6 @@ local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
 
-local LDD = LibStub:GetLibrary("LibUIDropDownMenu-4.0")
-
 -----------------------------------------------
 -- CheckButton
 -----------------------------------------------
@@ -34,7 +32,7 @@ end
 -- Slider
 -----------------------------------------------
 function lib:CreateSlider(panel, label, low, high, tooltip, configTable, configKey, valueChangedFunc)
-	local slider = CreateFrame("Slider", panel.name .. "ConfigSlider_" .. label, panel, "HorizontalSliderTemplate")
+	local slider = CreateFrame("Slider", panel.name .. "ConfigSlider_" .. label, panel, "UISliderTemplate")
 	-- slider:SetOrientation("HORIZONTAL")
     slider:SetMinMaxValues(low, high)
     slider:SetValueStep(1)
@@ -88,8 +86,9 @@ end
 -- valueChangedFunc: excute on value changed
 -- valueFunc: process value into a specific format
 function lib:CreateDropDown(panel, label, values, configTable, configKey, valueChangedFunc, valueFunc)
-	local dropdown = LDD:Create_UIDropDownMenu(panel.name .. "ConfigDropDown_" .. label, panel)
+	local dropdown = CreateFrame("Frame", panel.name .. "ConfigDropDown_" .. label, panel, "UIDropDownMenuTemplate")
 	-- dropdown:SetWidth(200)
+
 	local dropdownLabel = dropdown:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 	dropdownLabel:SetPoint("BOTTOMLEFT", dropdown, "TOPLEFT", 16, 3)
 	dropdownLabel:SetText(label)
@@ -101,11 +100,11 @@ function lib:CreateDropDown(panel, label, values, configTable, configKey, valueC
 		_G[dropdown:GetName().."Text"]:SetWidth(_G[dropdown:GetName().."Middle"]:GetWidth()-20)
 	end
 	
-	LDD:UIDropDownMenu_Initialize(dropdown, function()
-		local info = LDD:UIDropDownMenu_CreateInfo()
+	UIDropDownMenu_Initialize(dropdown, function()
+		local info = UIDropDownMenu_CreateInfo()
 		info.func = function(self)
 			configTable[configKey] = self.value
-			LDD:UIDropDownMenu_SetSelectedValue(dropdown, self.value)
+			UIDropDownMenu_SetSelectedValue(dropdown, self.value)
 			if valueChangedFunc then valueChangedFunc(self.value) end
 		end
 
@@ -118,10 +117,10 @@ function lib:CreateDropDown(panel, label, values, configTable, configKey, valueC
 			else
 				info.checked = nil
 			end
-			LDD:UIDropDownMenu_AddButton(info)
+			UIDropDownMenu_AddButton(info)
 		end
 	end)
-	LDD:UIDropDownMenu_SetSelectedValue(dropdown, configTable[configKey])
+	UIDropDownMenu_SetSelectedValue(dropdown, configTable[configKey])
 
 	return dropdown
 end

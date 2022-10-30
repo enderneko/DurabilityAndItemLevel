@@ -8,22 +8,22 @@ DAI.ALWAYS_USE_TOOLTIP = true
 local slotFontStrings = {}
 DAI.ilvlFontStrings = slotFontStrings
 local slotIDs = { -- http://wowprogramming.com/docs/api_types#inventoryID
-	[1] = "HeadSlot",
-	[2] = "NeckSlot",
-	[3] = "ShoulderSlot",
-	[5] = "ChestSlot",
-	[6] = "WaistSlot",
-	[7] = "LegsSlot",
-	[8] = "FeetSlot",
-	[9] = "WristSlot",
-	[10] = "HandsSlot",
-	[11] = "Finger0Slot",
-	[12] = "Finger1Slot",
-	[13] = "Trinket0Slot",
-	[14] = "Trinket1Slot",
-	[15] = "BackSlot",
-	[16] = "MainHandSlot",
-	[17] = "SecondaryHandSlot"
+    [1] = "HeadSlot",
+    [2] = "NeckSlot",
+    [3] = "ShoulderSlot",
+    [5] = "ChestSlot",
+    [6] = "WaistSlot",
+    [7] = "LegsSlot",
+    [8] = "FeetSlot",
+    [9] = "WristSlot",
+    [10] = "HandsSlot",
+    [11] = "Finger0Slot",
+    [12] = "Finger1Slot",
+    [13] = "Trinket0Slot",
+    [14] = "Trinket1Slot",
+    [15] = "BackSlot",
+    [16] = "MainHandSlot",
+    [17] = "SecondaryHandSlot"
 }
 
 -- local specEnchantSlots = {
@@ -113,16 +113,16 @@ local slotIDs = { -- http://wowprogramming.com/docs/api_types#inventoryID
 -- }
 
 local function GetSlotFontString(id, slot)
-	if(not slotFontStrings[id]) then
-		if not slot then -- not flyout button
-			slot = _G["Character" .. slotIDs[id]]
-		end
-		slotFontStrings[id] = slot:CreateFontString(nil, "OVERLAY")
-		
-		slotFontStrings[id]:SetFont(unpack(DAI:GetFont()))
-		slotFontStrings[id]:SetPoint(unpack(DurabilityAndItemLevel["ilvlPoint"]))
-	end
-	return slotFontStrings[id]
+    if(not slotFontStrings[id]) then
+        if not slot then -- not flyout button
+            slot = _G["Character" .. slotIDs[id]]
+        end
+        slotFontStrings[id] = slot:CreateFontString(nil, "OVERLAY")
+        
+        slotFontStrings[id]:SetFont(unpack(DAI:GetFont()))
+        slotFontStrings[id]:SetPoint(unpack(DurabilityAndItemLevel["ilvlPoint"]))
+    end
+    return slotFontStrings[id]
 end
 
 CreateFrame("GameTooltip", "DAI_Scanner", WorldFrame, "GameTooltipTemplate")
@@ -132,165 +132,165 @@ local S_ITEM_LEVEL = "^" .. string.gsub(_G.ITEM_LEVEL, "%%d", "(%%d+)")
 
 -- should not use itemLink, may contain inaccurate data
 function DAI:GetItemLevelFromTooltip(slot, bag)
-	local ilvl, scanedIlvl = 0
-	
-	-- use scanner
-	DAI_Scanner:SetOwner(WorldFrame, "ANCHOR_NONE")
-	if bag then
-		ilvl = select(4, GetItemInfo(GetContainerItemLink(bag, slot))) or 0
-		if bag == -1 then
-			DAI_Scanner:SetInventoryItem("player", BankButtonIDToInvSlotID(slot, nil))
-		else
-			DAI_Scanner:SetBagItem(bag, slot)
-		end
-	else
-		ilvl = select(4, GetItemInfo(GetInventoryItemLink("player", slot))) or 0
-		DAI_Scanner:SetInventoryItem("player", slot)
-	end
-
-	for i = 2, DAI_Scanner:NumLines() do
-		local text = _G["DAI_ScannerTextLeft"..i]:GetText()
-        if text and string.find(text, S_ITEM_LEVEL) then
-			scanedIlvl = string.match(text, S_ITEM_LEVEL)
-			scanedIlvl = tonumber(scanedIlvl)
-			break
+    local ilvl, scanedIlvl = 0
+    
+    -- use scanner
+    DAI_Scanner:SetOwner(WorldFrame, "ANCHOR_NONE")
+    if bag then
+        ilvl = select(4, GetItemInfo(GetContainerItemLink(bag, slot))) or 0
+        if bag == -1 then
+            DAI_Scanner:SetInventoryItem("player", BankButtonIDToInvSlotID(slot, nil))
+        else
+            DAI_Scanner:SetBagItem(bag, slot)
         end
-	end
+    else
+        ilvl = select(4, GetItemInfo(GetInventoryItemLink("player", slot))) or 0
+        DAI_Scanner:SetInventoryItem("player", slot)
+    end
 
-	return scanedIlvl and scanedIlvl or ilvl
+    for i = 2, DAI_Scanner:NumLines() do
+        local text = _G["DAI_ScannerTextLeft"..i]:GetText()
+        if text and string.find(text, S_ITEM_LEVEL) then
+            scanedIlvl = string.match(text, S_ITEM_LEVEL)
+            scanedIlvl = tonumber(scanedIlvl)
+            break
+        end
+    end
+
+    return scanedIlvl and scanedIlvl or ilvl
 end
 
 function DAI:GetItemInfo(itemLink, iLevel, checkEnchant)
-	-- local iQualityColor = select(4, GetItemQualityColor(GetInventoryItemQuality("player", slotID)))
-	-- https://wowpedia.fandom.com/wiki/ItemLink
-	-- item : itemID : enchantID : gemID1 : gemID2 : gemID3 : gemID4 : suffixID : uniqueID : linkLevel : specializationID : modifiersMask : itemContext : numBonusIDs[:bonusID1:bonusID2:...] : numModifiers[:modifierType1:modifierValue1:...] : relic1NumBonusIDs[:relicBonusID1:relicBonusID2:...] : relic2NumBonusIDs[...] : relic3NumBonusIDs[...] : crafterGUID : extraEnchantID
-	local iQualityColor, itemString = itemLink:match("(|c%w+)|Hitem:(.+)|h%[.*%]|h|r")
+    -- local iQualityColor = select(4, GetItemQualityColor(GetInventoryItemQuality("player", slotID)))
+    -- https://wowpedia.fandom.com/wiki/ItemLink
+    -- item : itemID : enchantID : gemID1 : gemID2 : gemID3 : gemID4 : suffixID : uniqueID : linkLevel : specializationID : modifiersMask : itemContext : numBonusIDs[:bonusID1:bonusID2:...] : numModifiers[:modifierType1:modifierValue1:...] : relic1NumBonusIDs[:relicBonusID1:relicBonusID2:...] : relic2NumBonusIDs[...] : relic3NumBonusIDs[...] : crafterGUID : extraEnchantID
+    local iQualityColor, itemString = itemLink:match("(|c%w+)|Hitem:(.+)|h%[.*%]|h|r")
 
-	local s = iQualityColor .. iLevel
-			
-	-- gem & enchant
-	if iLevel >= 171 then -- don't check old items
-		local itemStats = GetItemStats(itemLink)
-		local g = 1
-		local e = 1
-			
-		if itemStats["EMPTY_SOCKET_PRISMATIC"] then -- has socket
-			local gem = select(3, string.split(":", itemString))
-			if gem == "" then g = 0 end
-		end
-		table.wipe(itemStats)
-				
-		if checkEnchant then
-			local enchant = select(2, strsplit(":", itemString))
-			if enchant == "" then e = 0 end
-		end
-			
-		local result = tonumber(g .. e)
-		if result == 10 then
-			s = s .. " |cffff0000E|r"
-		elseif result == 01 then
-			s = s .. " |cffff0000G|r"
-		elseif result == 00 then
-			s = s .. " |cffff0000EG|r"
-		end
-	end
+    local s = iQualityColor .. iLevel
+            
+    -- gem & enchant
+    if iLevel >= 171 then -- don't check old items
+        local itemStats = GetItemStats(itemLink)
+        local g = 1
+        local e = 1
+            
+        if itemStats["EMPTY_SOCKET_PRISMATIC"] then -- has socket
+            local gem = select(3, string.split(":", itemString))
+            if gem == "" then g = 0 end
+        end
+        table.wipe(itemStats)
+                
+        if checkEnchant then
+            local enchant = select(2, strsplit(":", itemString))
+            if enchant == "" then e = 0 end
+        end
+            
+        local result = tonumber(g .. e)
+        if result == 10 then
+            s = s .. " |cffff0000E|r"
+        elseif result == 01 then
+            s = s .. " |cffff0000G|r"
+        elseif result == 00 then
+            s = s .. " |cffff0000EG|r"
+        end
+    end
 
-	return s
+    return s
 end
 
 local requireGatheringEnchant, isPrimaryStatStrength
 local function Update(slotID, itemLink, flyoutButton, flyoutButtonID, flyoutBag, flyoutSlot)
-	local slotFontString = GetSlotFontString(slotID, flyoutButton)
-	
-	-- if slot is ignored, also hide on its flyouts
-	if flyoutButtonID and not slotIDs[flyoutButtonID] then
-		slotFontString:SetText("")
-		return
-	end
+    local slotFontString = GetSlotFontString(slotID, flyoutButton)
+    
+    -- if slot is ignored, also hide on its flyouts
+    if flyoutButtonID and not slotIDs[flyoutButtonID] then
+        slotFontString:SetText("")
+        return
+    end
 
-	local s = ""
-	if itemLink then  -- has item
-		-- ilevel
-		local iLevel
+    local s = ""
+    if itemLink then  -- has item
+        -- ilevel
+        local iLevel
 
-		-- forceTooltip or isArtifactWeapon Legion
-		-- if DurabilityAndItemLevel["forceTooltip"] or ((slotID == 16 or slotID == 17) and select(3, GetItemInfo(itemLink)) == 6) then -- GetInventoryItemQuality("player", slotID) == 6
-		if DAI.ALWAYS_USE_TOOLTIP then
-			if flyoutBag and flyoutSlot then
-				iLevel = DAI:GetItemLevelFromTooltip(flyoutSlot, flyoutBag)
-			else
-				if flyoutSlot then slotID = flyoutSlot end -- flyoutBag == nil, it's an equipped item. Rings, Trinkets, Single-hand Weapons...
-				iLevel = DAI:GetItemLevelFromTooltip(slotID)
-			end
-		else
-			iLevel = select(4, GetItemInfo(itemLink))
-		end
-		
-		if iLevel then
-			local checkEnchant = false
-			local slots
-			if requireGatheringEnchant or isPrimaryStatStrength then
-				slots = {5, 8, 9, 10, 11, 12, 15, 16} -- chest, feet, wrist, hands, fingers, back, mainhand
-			else
-				slots = {5, 8, 9, 11, 12, 15, 16} -- chest, feet, wrist, fingers, back, mainhand
-			end
-			
-			if tContains(slots, slotID) or tContains(slots, flyoutButtonID) then
-				checkEnchant = true
-			elseif slotID == 17 or flyoutButtonID == 17 then -- offhand
-				local itemEquipLoc = select(4, GetItemInfoInstant(itemLink))
-				if itemEquipLoc == "INVTYPE_WEAPON" or itemEquipLoc == "INVTYPE_WEAPONOFFHAND" then
-					checkEnchant = true
-				end
-			end
-			
-			s = DAI:GetItemInfo(itemLink, iLevel, checkEnchant)
-		end
-	end
-	slotFontString:SetText(s)
+        -- forceTooltip or isArtifactWeapon Legion
+        -- if DurabilityAndItemLevel["forceTooltip"] or ((slotID == 16 or slotID == 17) and select(3, GetItemInfo(itemLink)) == 6) then -- GetInventoryItemQuality("player", slotID) == 6
+        if DAI.ALWAYS_USE_TOOLTIP then
+            if flyoutBag and flyoutSlot then
+                iLevel = DAI:GetItemLevelFromTooltip(flyoutSlot, flyoutBag)
+            else
+                if flyoutSlot then slotID = flyoutSlot end -- flyoutBag == nil, it's an equipped item. Rings, Trinkets, Single-hand Weapons...
+                iLevel = DAI:GetItemLevelFromTooltip(slotID)
+            end
+        else
+            iLevel = select(4, GetItemInfo(itemLink))
+        end
+        
+        if iLevel then
+            local checkEnchant = false
+            local slots
+            if requireGatheringEnchant or isPrimaryStatStrength then
+                slots = {5, 8, 9, 10, 11, 12, 15, 16} -- chest, feet, wrist, hands, fingers, back, mainhand
+            else
+                slots = {5, 8, 9, 11, 12, 15, 16} -- chest, feet, wrist, fingers, back, mainhand
+            end
+            
+            if tContains(slots, slotID) or tContains(slots, flyoutButtonID) then
+                checkEnchant = true
+            elseif slotID == 17 or flyoutButtonID == 17 then -- offhand
+                local itemEquipLoc = select(4, GetItemInfoInstant(itemLink))
+                if itemEquipLoc == "INVTYPE_WEAPON" or itemEquipLoc == "INVTYPE_WEAPONOFFHAND" then
+                    checkEnchant = true
+                end
+            end
+            
+            s = DAI:GetItemInfo(itemLink, iLevel, checkEnchant)
+        end
+    end
+    slotFontString:SetText(s)
 end
 
 local function UpdateFlyout(button)
-	local location = button.location
-	local player, bank, bags, voidStorage, slot, bag, tab, voidSlot = EquipmentManager_UnpackLocation(location)
-	
-	local itemLink = nil
-	if voidStorage and voidSlot then -- currently ignore void storage
-		itemLink = nil
-	elseif bag and slot then
-		itemLink = GetContainerItemLink(bag, slot)
-	elseif bank or (player and slot) then -- main bank bag begins with 48
-		itemLink = GetInventoryItemLink("player", slot)
-	end
+    local location = button.location
+    local player, bank, bags, voidStorage, slot, bag, tab, voidSlot = EquipmentManager_UnpackLocation(location)
+    
+    local itemLink = nil
+    if voidStorage and voidSlot then -- currently ignore void storage
+        itemLink = nil
+    elseif bag and slot then
+        itemLink = GetContainerItemLink(bag, slot)
+    elseif bank or (player and slot) then -- main bank bag begins with 48
+        itemLink = GetInventoryItemLink("player", slot)
+    end
 
-	-- button.id: invertoryID (slotID)
-	-- button:GetName() -> EquipmentFlyoutFrameButton1 ...
-	Update(button:GetName(), itemLink, button, button.id, bag, slot)
+    -- button.id: invertoryID (slotID)
+    -- button:GetName() -> EquipmentFlyoutFrameButton1 ...
+    Update(button:GetName(), itemLink, button, button.id, bag, slot)
 end
 
 function DAI:UpdateAllIlvl()
-	for id, _ in pairs(slotIDs) do
-		Update(id, GetInventoryItemLink("player", id))
-	end
+    for id, _ in pairs(slotIDs) do
+        Update(id, GetInventoryItemLink("player", id))
+    end
 end
 
 local function UpdateProfessions()
-	local prof1, prof2 = GetProfessions()
-	if prof1 then
-		prof1 = select(7, GetProfessionInfo(prof1))
-		prof1 = (prof1 == 182) or (prof1 == 186) or (prof1 == 393)
-	end
-	if prof2 then
-		prof2 = select(7, GetProfessionInfo(prof2))
-		prof2 = (prof2 == 182) or (prof2 == 186) or (prof2 == 393)
-	end
-	requireGatheringEnchant = prof1 or prof2
+    local prof1, prof2 = GetProfessions()
+    if prof1 then
+        prof1 = select(7, GetProfessionInfo(prof1))
+        prof1 = (prof1 == 182) or (prof1 == 186) or (prof1 == 393)
+    end
+    if prof2 then
+        prof2 = select(7, GetProfessionInfo(prof2))
+        prof2 = (prof2 == 182) or (prof2 == 186) or (prof2 == 393)
+    end
+    requireGatheringEnchant = prof1 or prof2
 end
 
 local function UpdatePrimaryStat()
-	-- Spec's primary stat, as listed in SPEC_STAT_STRINGS[1] global. 1 - Strength, 2 - Agility, 4 - Intellect.
-	local primaryStat = select(6, GetSpecializationInfo(GetSpecialization()))
-	isPrimaryStatStrength = primaryStat == 1
+    -- Spec's primary stat, as listed in SPEC_STAT_STRINGS[1] global. 1 - Strength, 2 - Agility, 4 - Intellect.
+    local primaryStat = select(6, GetSpecializationInfo(GetSpecialization()))
+    isPrimaryStatStrength = primaryStat == 1
 end
 
 local f = CreateFrame("Frame")
@@ -299,46 +299,46 @@ f:RegisterEvent("SKILL_LINES_CHANGED")
 f:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 
 f:SetScript("OnEvent", function(self, event, arg1)
-	if event == "PLAYER_ENTERING_WORLD" then
-		f:UnregisterEvent("PLAYER_ENTERING_WORLD")
-		
-		UpdateProfessions()
-		UpdatePrimaryStat()
+    if event == "PLAYER_ENTERING_WORLD" then
+        f:UnregisterEvent("PLAYER_ENTERING_WORLD")
+        
+        UpdateProfessions()
+        UpdatePrimaryStat()
 
-		CharacterFrame:HookScript("OnShow", function()
-			f:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
-			f:RegisterEvent("UNIT_INVENTORY_CHANGED")
-			C_Timer.After(.1, function()
-				DAI:UpdateAllIlvl()
-			end)
-		end)
-		
-		CharacterFrame:HookScript("OnHide", function()
-			f:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
-			f:UnregisterEvent("UNIT_INVENTORY_CHANGED")
-		end)
+        CharacterFrame:HookScript("OnShow", function()
+            f:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
+            f:RegisterEvent("UNIT_INVENTORY_CHANGED")
+            C_Timer.After(.1, function()
+                DAI:UpdateAllIlvl()
+            end)
+        end)
+        
+        CharacterFrame:HookScript("OnHide", function()
+            f:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
+            f:UnregisterEvent("UNIT_INVENTORY_CHANGED")
+        end)
 
-		-- Interface\FrameXML\EquipmentFlyout.lua
-		hooksecurefunc("EquipmentFlyout_DisplayButton", function(button)
-			UpdateFlyout(button)
-		end)
+        -- Interface\FrameXML\EquipmentFlyout.lua
+        hooksecurefunc("EquipmentFlyout_DisplayButton", function(button)
+            UpdateFlyout(button)
+        end)
 
-	elseif event == "SKILL_LINES_CHANGED" then
-		UpdateProfessions()
+    elseif event == "SKILL_LINES_CHANGED" then
+        UpdateProfessions()
 
-	elseif event == "ACTIVE_TALENT_GROUP_CHANGED" then
-		UpdatePrimaryStat()
+    elseif event == "ACTIVE_TALENT_GROUP_CHANGED" then
+        UpdatePrimaryStat()
 
-	elseif event == "UNIT_INVENTORY_CHANGED" then
-		if arg1 == "player" then
-			C_Timer.After(.1, function()
-				DAI:UpdateAllIlvl()
-			end)
-		end
-	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
-		if slotIDs[arg1] then
-			Update(arg1, GetInventoryItemLink("player", arg1))
-		end
-		
-	end
+    elseif event == "UNIT_INVENTORY_CHANGED" then
+        if arg1 == "player" then
+            C_Timer.After(.1, function()
+                DAI:UpdateAllIlvl()
+            end)
+        end
+    elseif event == "PLAYER_EQUIPMENT_CHANGED" then
+        if slotIDs[arg1] then
+            Update(arg1, GetInventoryItemLink("player", arg1))
+        end
+        
+    end
 end)
