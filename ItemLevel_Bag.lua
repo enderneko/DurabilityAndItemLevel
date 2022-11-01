@@ -67,7 +67,7 @@ end
 -- end)
 --! Interface\FrameXML\ContainerFrame.lua - ContainerFrameMixin:UpdateItems()
 local function UpdateItems(frame)
-    print(frame:GetName())
+    -- print(frame:GetName())
     for _, itemButton in frame:EnumerateValidItems() do
         UpdateButton(itemButton, itemButton:GetBagID(), itemButton:GetID())
     end
