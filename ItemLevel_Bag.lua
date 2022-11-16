@@ -25,6 +25,7 @@ local function GetButtonFontString(button)
     return bagFontStrings[name]
 end
 
+local checkedSlots = {"INVTYPE_FINGER", "INVTYPE_WRIST", "INVTYPE_CHEST", "INVTYPE_FEET", "INVTYPE_CLOAK", "INVTYPE_WEAPON", "INVTYPE_2HWEAPON", "INVTYPE_WEAPONMAINHAND", "INVTYPE_WEAPONOFFHAND", "INVTYPE_RANGED"}
 local function UpdateButton(button, bag, slot)
     if not DurabilityAndItemLevel["showInBags"] then return end
 
@@ -49,7 +50,7 @@ local function UpdateButton(button, bag, slot)
 
             if iLevel and iLevel >= DurabilityAndItemLevel["iThreshold"] then
                 local checkEnchant = false
-                if tContains({"INVTYPE_FINGER", "INVTYPE_HAND", "INVTYPE_WEAPON", "INVTYPE_2HWEAPON", "INVTYPE_WEAPONMAINHAND", "INVTYPE_WEAPONOFFHAND", "INVTYPE_RANGEDRIGHT"}, itemEquipLoc) then
+                if tContains(checkedSlots, itemEquipLoc) then
                     checkEnchant = true
                 end
                 

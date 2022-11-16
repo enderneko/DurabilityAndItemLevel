@@ -214,6 +214,7 @@ function DAI:GetItemInfo(itemLink, iLevel, checkEnchant)
 end
 
 -- local requireGatheringEnchant, isPrimaryStatStrength
+local checkedSlots = {5, 8, 9, 11, 12, 15, 16} -- chest, feet, wrist, fingers, back, mainhand
 local function Update(slotID, itemLink, flyoutButton, flyoutButtonID, flyoutBag, flyoutSlot)
     local slotFontString = GetSlotFontString(slotID, flyoutButton)
     
@@ -239,15 +240,14 @@ local function Update(slotID, itemLink, flyoutButton, flyoutButtonID, flyoutBag,
         
         if iLevel then
             local checkEnchant = false
-            local slots = {5, 8, 9, 11, 12, 15, 16} -- chest, feet, wrist, fingers, back, mainhand
 
             -- if requireGatheringEnchant or isPrimaryStatStrength then
-            --     slots = {5, 8, 9, 10, 11, 12, 15, 16} -- chest, feet, wrist, hands, fingers, back, mainhand
+            --     checkedSlots = {5, 8, 9, 10, 11, 12, 15, 16} -- chest, feet, wrist, hands, fingers, back, mainhand
             -- else
-            --     slots = {5, 8, 9, 11, 12, 15, 16} -- chest, feet, wrist, fingers, back, mainhand
+            --     checkedSlots = {5, 8, 9, 11, 12, 15, 16} -- chest, feet, wrist, fingers, back, mainhand
             -- end
             
-            if tContains(slots, slotID) or tContains(slots, flyoutButtonID) then
+            if tContains(checkedSlots, slotID) or tContains(checkedSlots, flyoutButtonID) then
                 checkEnchant = true
             elseif slotID == 17 or flyoutButtonID == 17 then -- offhand
                 local itemEquipLoc = select(4, GetItemInfoInstant(itemLink))
