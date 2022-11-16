@@ -29,7 +29,7 @@ local function UpdateButton(button, bag, slot)
     if not DurabilityAndItemLevel["showInBags"] then return end
 
     local buttonFontString = GetButtonFontString(button)
-    local itemLink = GetContainerItemLink(bag, slot)
+    local itemLink = C_Container.GetContainerItemLink(bag, slot)
 
     local s = ""
     if itemLink then  -- has item
@@ -45,11 +45,7 @@ local function UpdateButton(button, bag, slot)
             -- end 
 
             -- get ilvl
-            if DAI.ALWAYS_USE_TOOLTIP then
-                iLevel = DAI:GetItemLevelFromTooltip(slot, bag)
-            else
-                iLevel = select(4, GetItemInfo(itemLink))
-            end
+            iLevel = DAI:GetItemLevelFromTooltip(slot, bag)
 
             if iLevel and iLevel >= DurabilityAndItemLevel["iThreshold"] then
                 local checkEnchant = false

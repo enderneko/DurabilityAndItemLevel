@@ -1,10 +1,12 @@
-## Interface: 100000
+## Interface: 100002
 ## Title: Durability And ItemLevel
 ## Notes: Minimalist durability and item level on each slot in character frame.
 ## Notes-zhCN: 角色面板耐久度&物品等级显示
-## Version: 3.6.3
-## Author: fyhcslb
+## Version: 3.7.0
+## Author: enderneko
 ## SavedVariables: DurabilityAndItemLevel
+
+## X-Curse-Project-ID: 101506
 
 Locales\enUS.lua
 Locales\zhCN.lua
