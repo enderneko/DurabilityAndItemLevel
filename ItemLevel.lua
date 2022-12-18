@@ -175,13 +175,43 @@ function DAI:GetItemLevelFromTooltip(slot, bag)
     return scanedIlvl and scanedIlvl or ilvl
 end
 
+local function ConvertRGBToHEX(r, g, b)
+    local result = ""
+
+    for key, value in pairs({r*255, g*255, b*255}) do
+        local hex = ""
+
+        while(value > 0)do
+            local index = math.fmod(value, 16) + 1
+            value = math.floor(value / 16)
+            hex = string.sub("0123456789ABCDEF", index, index) .. hex			
+        end
+
+        if(string.len(hex) == 0)then
+            hex = "00"
+
+        elseif(string.len(hex) == 1)then
+            hex = "0" .. hex
+        end
+
+        result = result .. hex
+    end
+
+    return result
+end
+
 function DAI:GetItemInfo(itemLink, iLevel, checkEnchant)
     -- local iQualityColor = select(4, GetItemQualityColor(GetInventoryItemQuality("player", slotID)))
     -- https://wowpedia.fandom.com/wiki/ItemLink
     -- item : itemID : enchantID : gemID1 : gemID2 : gemID3 : gemID4 : suffixID : uniqueID : linkLevel : specializationID : modifiersMask : itemContext : numBonusIDs[:bonusID1:bonusID2:...] : numModifiers[:modifierType1:modifierValue1:...] : relic1NumBonusIDs[:relicBonusID1:relicBonusID2:...] : relic2NumBonusIDs[...] : relic3NumBonusIDs[...] : crafterGUID : extraEnchantID
     local iQualityColor, itemString = itemLink:match("(|c%w+)|Hitem:(.+)|h%[.*%]|h|r")
 
-    local s = iQualityColor .. iLevel
+    local s
+    if DurabilityAndItemLevel["customIlvlColor"][1] then
+        s = "|cff" .. ConvertRGBToHEX(unpack(DurabilityAndItemLevel["customIlvlColor"][2])) .. iLevel
+    else
+        s = iQualityColor .. iLevel
+    end
             
     -- gem & enchant
     if iLevel >= 171 then -- don't check old items
@@ -214,7 +244,7 @@ function DAI:GetItemInfo(itemLink, iLevel, checkEnchant)
 end
 
 -- local requireGatheringEnchant, isPrimaryStatStrength
-local checkedSlots = {5, 8, 9, 11, 12, 15, 16} -- chest, feet, wrist, fingers, back, mainhand
+local checkedSlots = {5, 7, 8, 9, 11, 12, 15, 16} -- chest, legs, feet, wrist, fingers, back, mainhand
 local function Update(slotID, itemLink, flyoutButton, flyoutButtonID, flyoutBag, flyoutSlot)
     local slotFontString = GetSlotFontString(slotID, flyoutButton)
     
@@ -320,7 +350,7 @@ f:SetScript("OnEvent", function(self, event, arg1)
         CharacterFrame:HookScript("OnShow", function()
             f:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
             f:RegisterEvent("UNIT_INVENTORY_CHANGED")
-            C_Timer.After(.1, function()
+            C_Timer.After(0.1, function()
                 DAI:UpdateAllIlvl()
             end)
         end)

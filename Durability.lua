@@ -20,7 +20,7 @@ local slotIDs = { -- http://wowprogramming.com/docs/api_types#inventoryID
 }
 
 local function GetSlotFontString(slotID)
-    if(not slotFontStrings[slotID]) then
+    if not slotFontStrings[slotID] then
         local slot = _G["Character" .. slotIDs[slotID]]
         slotFontStrings[slotID] = slot:CreateFontString(nil, "OVERLAY")
         
@@ -43,6 +43,13 @@ local function GetThresholdColor(percent)
 end
 
 local function UpdateDur(slotID)
+    if not DurabilityAndItemLevel["showDur"] then
+        if slotFontStrings[slotID] then
+            slotFontStrings[slotID]:Hide()
+        end
+        return
+    end
+
     local v1, v2 = GetInventoryItemDurability(slotID)
     v1, v2 = tonumber(v1) or 0, tonumber(v2) or 0
     
@@ -54,6 +61,7 @@ local function UpdateDur(slotID)
     else
         s:SetText("")
     end
+    s:Show()
 end
 
 function DAI:UpdateAllDur()
@@ -73,7 +81,7 @@ f:SetScript("OnEvent", function(self, event, arg1)
         CharacterFrame:HookScript("OnShow", function()
             f:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
             f:RegisterEvent("UPDATE_INVENTORY_DURABILITY")
-            C_Timer.After(.1, function()
+            C_Timer.After(0.1, function()
                 DAI:UpdateAllDur()
             end)
         end)
@@ -91,7 +99,7 @@ f:SetScript("OnEvent", function(self, event, arg1)
 
     else -- UPDATE_INVENTORY_DURABILITY multi-fired
         if timer then timer:Cancel() end
-        timer = C_Timer.NewTimer(.1, function()
+        timer = C_Timer.NewTimer(0.1, function()
             DAI:UpdateAllDur()
         end)
     end
