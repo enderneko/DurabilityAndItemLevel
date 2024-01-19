@@ -118,7 +118,8 @@ frame:SetScript("OnEvent", function()
                 UpdateButton(itemButton, itemButton:GetBagID(), itemButton:GetID())
             end
         end
-        for _, frame in ipairs(UIParent.ContainerFrames) do
+        for i = 1, 5 do
+            local frame = ContainerFrameContainer.ContainerFrames[i]
             hooksecurefunc(frame, "UpdateItems", UpdateItems)
         end
         hooksecurefunc(ContainerFrameCombinedBags, "UpdateItems", UpdateItems)
