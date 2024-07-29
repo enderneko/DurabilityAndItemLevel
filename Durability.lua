@@ -23,8 +23,8 @@ local function GetSlotFontString(slotID)
     if not slotFontStrings[slotID] then
         local slot = _G["Character" .. slotIDs[slotID]]
         slotFontStrings[slotID] = slot:CreateFontString(nil, "OVERLAY")
-        
-        slotFontStrings[slotID]:SetFont(unpack(DAI:GetFont()))
+
+        slotFontStrings[slotID]:SetFont(unpack(DAI.GetFont()))
         slotFontStrings[slotID]:SetPoint(unpack(DurabilityAndItemLevel["durPoint"]))
     end
     return slotFontStrings[slotID]
@@ -51,20 +51,23 @@ local function UpdateDur(slotID)
     end
 
     local v1, v2 = GetInventoryItemDurability(slotID)
-    v1, v2 = tonumber(v1) or 0, tonumber(v2) or 0
-    
-    local percent = v1 / v2
+
     local s = GetSlotFontString(slotID)
-    if (v2 ~= 0) and (DurabilityAndItemLevel["alwaysShowDur"] or percent < 1) then	
-        s:SetTextColor(GetThresholdColor(percent))
-        s:SetText(math.floor(percent * 100) .. "%")
+    if v1 and v2 then
+        local percent = v1 / v2
+        if DurabilityAndItemLevel["alwaysShowDur"] or percent < 1 then
+            s:SetTextColor(GetThresholdColor(percent))
+            s:SetText(math.floor(percent * 100) .. "%")
+        else
+            s:SetText("")
+        end
     else
         s:SetText("")
     end
     s:Show()
 end
 
-function DAI:UpdateAllDur()
+function DAI.UpdateAllDur()
     for slotID, _ in pairs(slotIDs) do
         UpdateDur(slotID)
     end
@@ -77,15 +80,15 @@ local timer
 f:SetScript("OnEvent", function(self, event, arg1)
     if event == "PLAYER_ENTERING_WORLD" then
         f:UnregisterEvent("PLAYER_ENTERING_WORLD")
-        
+
         CharacterFrame:HookScript("OnShow", function()
             f:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
             f:RegisterEvent("UPDATE_INVENTORY_DURABILITY")
             C_Timer.After(0.1, function()
-                DAI:UpdateAllDur()
+                DAI.UpdateAllDur()
             end)
         end)
-        
+
         CharacterFrame:HookScript("OnHide", function()
             f:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
             f:UnregisterEvent("UPDATE_INVENTORY_DURABILITY")
@@ -100,7 +103,7 @@ f:SetScript("OnEvent", function(self, event, arg1)
     else -- UPDATE_INVENTORY_DURABILITY multi-fired
         if timer then timer:Cancel() end
         timer = C_Timer.NewTimer(0.1, function()
-            DAI:UpdateAllDur()
+            DAI.UpdateAllDur()
         end)
     end
 end)

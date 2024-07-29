@@ -56,11 +56,11 @@ function lib:CreateSlider(panel, label, low, high, tooltip, configTable, configK
     slider:SetValueStep(1)
     slider:SetObeyStepOnDrag(true)
     slider:SetSize(120, 17)
-    
+
     local sliderLabel = slider:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     sliderLabel:SetPoint("BOTTOM", slider, "TOP")
     sliderLabel:SetText(label)
-    
+
     if tooltip then
         slider.tooltipText = label
         slider.tooltipRequirement = tooltip
@@ -81,13 +81,13 @@ function lib:CreateSlider(panel, label, low, high, tooltip, configTable, configK
     local vText = slider:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     vText:SetHeight(35)
     vText:SetPoint("LEFT", slider, "RIGHT", 5, 0)
-    
+
     slider:SetScript("OnValueChanged", function(self, value)
         vText:SetText(value)
         configTable[configKey] = value
         if valueChangedFunc then valueChangedFunc(value) end
     end)
-    
+
     vText:SetText(configTable[configKey])
     slider:SetValue(configTable[configKey])
 
@@ -113,7 +113,7 @@ function lib:CreateDropDown(panel, label, values, configTable, configKey, valueC
         _G[dropdown:GetName().."Middle"]:SetWidth(width)
         _G[dropdown:GetName().."Text"]:SetWidth(_G[dropdown:GetName().."Middle"]:GetWidth()-20)
     end
-    
+
     UIDropDownMenu_Initialize(dropdown, function()
         local info = UIDropDownMenu_CreateInfo()
         info.func = function(self)
@@ -125,7 +125,7 @@ function lib:CreateDropDown(panel, label, values, configTable, configKey, valueC
         for i, value in ipairs(values) do
             info.text = value
             info.value = valueFunc and valueFunc(value) or value
-            
+
             if (configTable[configKey] == info.value) then
                 info.checked = 1
             else
@@ -145,7 +145,7 @@ end
 local function ShowColorPicker(r, g, b, a, changedCallback)
     ColorPickerFrame.hasOpacity, ColorPickerFrame.opacity = (a ~= nil), a
     ColorPickerFrame.previousValues = {r,g,b,a}
-    ColorPickerFrame.func, ColorPickerFrame.opacityFunc, ColorPickerFrame.cancelFunc = 
+    ColorPickerFrame.func, ColorPickerFrame.opacityFunc, ColorPickerFrame.cancelFunc =
      changedCallback, changedCallback, changedCallback
     ColorPickerFrame:SetColorRGB(r,g,b)
     ColorPickerFrame:Hide() -- Need to run the OnShow handler.
@@ -209,30 +209,14 @@ end
 -----------------------------------------------
 -- Panel
 -----------------------------------------------
--- local function Panel_OnCancel()
--- 	print("Panel_OnCancel")
--- end
--- local function Panel_OnSave()
--- 	print("Panel_OnSave")
--- end
--- local function Panel_OnDefaults()
--- 	print("Panel_OnDefaults")
--- end
--- local function Panel_OnRefresh()
--- 	print("Panel_OnRefresh")
--- end
-
 function lib:CreateConfigPanel(addonName)
     local panel = CreateFrame("Frame")
     panel.name = addonName
-    -- panel.okay = Panel_OnSave
-    -- panel.cancel = Panel_OnCancel
-    -- panel.default  = Panel_OnDefaults
-    -- panel.refresh  = Panel_OnRefresh
-    InterfaceOptions_AddCategory(panel)
+
+	local category, layout = Settings.RegisterCanvasLayoutCategory(panel, addonName);
+	Settings.RegisterAddOnCategory(category)
 
     SetTitle(panel)
 
     return panel
 end
-

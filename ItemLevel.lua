@@ -4,6 +4,10 @@ local DAI = select(2, ...)
 -- fyhcslb
 --------------------------------------------------------------------------------
 
+local GetItemInfo = C_Item.GetItemInfo
+local GetItemStats = C_Item.GetItemStats
+local GetItemInfoInstant = C_Item.GetItemInfoInstant
+
 local slotFontStrings = {}
 DAI.ilvlFontStrings = slotFontStrings
 local slotIDs = { -- http://wowprogramming.com/docs/api_types#inventoryID
@@ -117,8 +121,8 @@ local function GetSlotFontString(id, slot)
             slot = _G["Character" .. slotIDs[id]]
         end
         slotFontStrings[id] = slot:CreateFontString(nil, "OVERLAY")
-        
-        slotFontStrings[id]:SetFont(unpack(DAI:GetFont()))
+
+        slotFontStrings[id]:SetFont(unpack(DAI.GetFont()))
         slotFontStrings[id]:SetPoint(unpack(DurabilityAndItemLevel["ilvlPoint"]))
     end
     return slotFontStrings[id]
@@ -130,10 +134,10 @@ end
 local S_ITEM_LEVEL = "^" .. string.gsub(_G.ITEM_LEVEL, "%%d", "(%%d+)")
 
 -- should not use itemLink, may contain inaccurate data
-function DAI:GetItemLevelFromTooltip(slot, bag)
+function DAI.GetItemLevelFromTooltip(slot, bag)
     local ilvl, scanedIlvl = 0
     local tooltipData
-    
+
     -- use scanner
     -- DAI_Scanner:SetOwner(WorldFrame, "ANCHOR_NONE")
     if bag then
@@ -163,7 +167,6 @@ function DAI:GetItemLevelFromTooltip(slot, bag)
     if tooltipData then
         for i = 2, #tooltipData.lines do
             local line = tooltipData.lines[i]
-            TooltipUtil.SurfaceArgs(line)
             if line.leftText and string.find(line.leftText, S_ITEM_LEVEL) then
                 scanedIlvl = string.match(line.leftText, S_ITEM_LEVEL)
                 scanedIlvl = tonumber(scanedIlvl)
@@ -184,7 +187,7 @@ local function ConvertRGBToHEX(r, g, b)
         while(value > 0)do
             local index = math.fmod(value, 16) + 1
             value = math.floor(value / 16)
-            hex = string.sub("0123456789ABCDEF", index, index) .. hex			
+            hex = string.sub("0123456789ABCDEF", index, index) .. hex
         end
 
         if(string.len(hex) == 0)then
@@ -200,7 +203,7 @@ local function ConvertRGBToHEX(r, g, b)
     return result
 end
 
-function DAI:GetItemInfo(itemLink, iLevel, checkEnchant)
+function DAI.GetItemInfo(itemLink, iLevel, checkEnchant)
     -- local iQualityColor = select(4, GetItemQualityColor(GetInventoryItemQuality("player", slotID)))
     -- https://wowpedia.fandom.com/wiki/ItemLink
     -- item : itemID : enchantID : gemID1 : gemID2 : gemID3 : gemID4 : suffixID : uniqueID : linkLevel : specializationID : modifiersMask : itemContext : numBonusIDs[:bonusID1:bonusID2:...] : numModifiers[:modifierType1:modifierValue1:...] : relic1NumBonusIDs[:relicBonusID1:relicBonusID2:...] : relic2NumBonusIDs[...] : relic3NumBonusIDs[...] : crafterGUID : extraEnchantID
@@ -212,24 +215,24 @@ function DAI:GetItemInfo(itemLink, iLevel, checkEnchant)
     else
         s = iQualityColor .. iLevel
     end
-            
+
     -- gem & enchant
     if iLevel >= 171 then -- don't check old items
         local itemStats = GetItemStats(itemLink)
         local g = 1
         local e = 1
-            
+
         if itemStats["EMPTY_SOCKET_PRISMATIC"] then -- has socket
             local gem = select(3, string.split(":", itemString))
             if gem == "" then g = 0 end
         end
         table.wipe(itemStats)
-                
+
         if checkEnchant then
             local enchant = select(2, strsplit(":", itemString))
             if enchant == "" then e = 0 end
         end
-            
+
         local result = tonumber(g .. e)
         if result == 10 then
             s = s .. " |cffff0000E|r"
@@ -247,7 +250,7 @@ end
 local checkedSlots = {5, 7, 8, 9, 11, 12, 15, 16} -- chest, legs, feet, wrist, fingers, back, mainhand
 local function Update(slotID, itemLink, flyoutButton, flyoutButtonID, flyoutBag, flyoutSlot)
     local slotFontString = GetSlotFontString(slotID, flyoutButton)
-    
+
     -- if slot is ignored, also hide on its flyouts
     if flyoutButtonID and not slotIDs[flyoutButtonID] then
         slotFontString:SetText("")
@@ -262,12 +265,12 @@ local function Update(slotID, itemLink, flyoutButton, flyoutButtonID, flyoutBag,
         -- forceTooltip or isArtifactWeapon Legion
         -- if DurabilityAndItemLevel["forceTooltip"] or ((slotID == 16 or slotID == 17) and select(3, GetItemInfo(itemLink)) == 6) then -- GetInventoryItemQuality("player", slotID) == 6
         if flyoutBag and flyoutSlot then
-            iLevel = DAI:GetItemLevelFromTooltip(flyoutSlot, flyoutBag)
+            iLevel = DAI.GetItemLevelFromTooltip(flyoutSlot, flyoutBag)
         else
             if flyoutSlot then slotID = flyoutSlot end -- flyoutBag == nil, it's an equipped item. Rings, Trinkets, Single-hand Weapons...
-            iLevel = DAI:GetItemLevelFromTooltip(slotID)
+            iLevel = DAI.GetItemLevelFromTooltip(slotID)
         end
-        
+
         if iLevel then
             local checkEnchant = false
 
@@ -276,7 +279,7 @@ local function Update(slotID, itemLink, flyoutButton, flyoutButtonID, flyoutBag,
             -- else
             --     checkedSlots = {5, 8, 9, 11, 12, 15, 16} -- chest, feet, wrist, fingers, back, mainhand
             -- end
-            
+
             if tContains(checkedSlots, slotID) or tContains(checkedSlots, flyoutButtonID) then
                 checkEnchant = true
             elseif slotID == 17 or flyoutButtonID == 17 then -- offhand
@@ -285,8 +288,8 @@ local function Update(slotID, itemLink, flyoutButton, flyoutButtonID, flyoutBag,
                     checkEnchant = true
                 end
             end
-            
-            s = DAI:GetItemInfo(itemLink, iLevel, checkEnchant)
+
+            s = DAI.GetItemInfo(itemLink, iLevel, checkEnchant)
         end
     end
     slotFontString:SetText(s)
@@ -295,7 +298,7 @@ end
 local function UpdateFlyout(button)
     local location = button.location
     local player, bank, bags, voidStorage, slot, bag, tab, voidSlot = EquipmentManager_UnpackLocation(location)
-    
+
     local itemLink = nil
     if voidStorage and voidSlot then -- currently ignore void storage
         itemLink = nil
@@ -310,7 +313,7 @@ local function UpdateFlyout(button)
     Update(button:GetName(), itemLink, button, button.id, bag, slot)
 end
 
-function DAI:UpdateAllIlvl()
+function DAI.UpdateAllIlvl()
     for id, _ in pairs(slotIDs) do
         Update(id, GetInventoryItemLink("player", id))
     end
@@ -343,7 +346,7 @@ f:RegisterEvent("PLAYER_ENTERING_WORLD")
 f:SetScript("OnEvent", function(self, event, arg1)
     if event == "PLAYER_ENTERING_WORLD" then
         f:UnregisterEvent("PLAYER_ENTERING_WORLD")
-        
+
         -- UpdateProfessions()
         -- UpdatePrimaryStat()
 
@@ -351,10 +354,10 @@ f:SetScript("OnEvent", function(self, event, arg1)
             f:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
             f:RegisterEvent("UNIT_INVENTORY_CHANGED")
             C_Timer.After(0.1, function()
-                DAI:UpdateAllIlvl()
+                DAI.UpdateAllIlvl()
             end)
         end)
-        
+
         CharacterFrame:HookScript("OnHide", function()
             f:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
             f:UnregisterEvent("UNIT_INVENTORY_CHANGED")
@@ -374,13 +377,13 @@ f:SetScript("OnEvent", function(self, event, arg1)
     elseif event == "UNIT_INVENTORY_CHANGED" then
         if arg1 == "player" then
             C_Timer.After(0.1, function()
-                DAI:UpdateAllIlvl()
+                DAI.UpdateAllIlvl()
             end)
         end
     elseif event == "PLAYER_EQUIPMENT_CHANGED" then
         if slotIDs[arg1] then
             Update(arg1, GetInventoryItemLink("player", arg1))
         end
-        
+
     end
 end)

@@ -4,10 +4,13 @@ local DAI = select(2, ...)
 -- fyhcslb
 --------------------------------------------------------------------------------
 
+local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
+local GetItemInfoInstant = C_Item.GetItemInfoInstant
+
 local bagFontStrings = {}
 DAI.bagFontStrings = bagFontStrings
 
-function DAI:UpdateAllBags(show)
+function DAI.UpdateAllBags(show)
     if not show then
         for _, s in pairs(bagFontStrings) do
             s:SetText("")
@@ -16,13 +19,12 @@ function DAI:UpdateAllBags(show)
 end
 
 local function GetButtonFontString(button)
-    local name = button:GetName()
-    if not bagFontStrings[name] then
-        bagFontStrings[name] = button:CreateFontString(nil, "OVERLAY")
-        bagFontStrings[name]:SetFont(unpack(DAI:GetFont()))
-        bagFontStrings[name]:SetPoint(unpack(DurabilityAndItemLevel["bagPoint"]))
+    if not bagFontStrings[button] then
+        bagFontStrings[button] = button:CreateFontString(nil, "OVERLAY")
+        bagFontStrings[button]:SetFont(unpack(DAI.GetFont()))
+        bagFontStrings[button]:SetPoint(unpack(DurabilityAndItemLevel["bagPoint"]))
     end
-    return bagFontStrings[name]
+    return bagFontStrings[button]
 end
 
 local checkedSlots = {"INVTYPE_FINGER", "INVTYPE_WRIST", "INVTYPE_CHEST", "INVTYPE_FEET", "INVTYPE_CLOAK", "INVTYPE_WEAPON", "INVTYPE_2HWEAPON", "INVTYPE_WEAPONMAINHAND", "INVTYPE_WEAPONOFFHAND", "INVTYPE_RANGED"}
@@ -43,18 +45,18 @@ local function UpdateButton(button, bag, slot)
             -- if not tContains({2, 4}, itemClassID) then
             -- 	buttonFontString:SetText("")
             -- 	return
-            -- end 
+            -- end
 
             -- get ilvl
-            iLevel = DAI:GetItemLevelFromTooltip(slot, bag)
+            iLevel = DAI.GetItemLevelFromTooltip(slot, bag)
 
             if iLevel and iLevel >= DurabilityAndItemLevel["iThreshold"] then
                 local checkEnchant = false
                 if tContains(checkedSlots, itemEquipLoc) then
                     checkEnchant = true
                 end
-                
-                s = DAI:GetItemInfo(itemLink, iLevel, checkEnchant)
+
+                s = DAI.GetItemInfo(itemLink, iLevel, checkEnchant)
             end
         end
     end
@@ -70,7 +72,7 @@ frame:SetScript("OnEvent", function()
         hooksecurefunc(Bagnon.Item, "Update", function(self)
             UpdateButton(self, self:GetBag(), self:GetID())
         end)
-        
+
     elseif IsAddOnLoaded("Baggins") then -- Baggins
         hooksecurefunc(Baggins, "UpdateItemButton", function(baggins, bagframe, button, bag, slot)
             UpdateButton(button, bag, slot)
