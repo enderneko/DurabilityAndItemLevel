@@ -143,13 +143,16 @@ end
 -- ColorSwatch
 -----------------------------------------------
 local function ShowColorPicker(r, g, b, a, changedCallback)
-    ColorPickerFrame.hasOpacity, ColorPickerFrame.opacity = (a ~= nil), a
-    ColorPickerFrame.previousValues = {r,g,b,a}
-    ColorPickerFrame.func, ColorPickerFrame.opacityFunc, ColorPickerFrame.cancelFunc =
-     changedCallback, changedCallback, changedCallback
-    ColorPickerFrame:SetColorRGB(r,g,b)
-    ColorPickerFrame:Hide() -- Need to run the OnShow handler.
-    ColorPickerFrame:Show()
+    ColorPickerFrame:SetupColorPickerAndShow({
+        r = r,
+        g = g,
+        b = b,
+        swatchFunc = changedCallback,
+        hasOpacity = a ~= nil,
+        opacity = a,
+        opacityFunc = changedCallback,
+        cancelFunc = changedCallback,
+    })
 end
 
 function lib:CreateColorSwatch(panel, label, tooltip, hasAlpha, valueChangedFunc)
@@ -171,7 +174,7 @@ function lib:CreateColorSwatch(panel, label, tooltip, hasAlpha, valueChangedFunc
         if restore then
             newR, newG, newB, newA = unpack(restore)
         else
-            newA, newR, newG, newB = OpacitySliderFrame:GetValue(), ColorPickerFrame:GetColorRGB()
+            newA, newR, newG, newB = ColorPickerFrame:GetColorAlpha(), ColorPickerFrame:GetColorRGB()
         end
 
         if hasAlpha then
