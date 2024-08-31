@@ -41,7 +41,7 @@ local function UpdateButton(button, bag, slot)
         -- itemID, itemType, itemSubType, itemEquipLoc, icon, itemClassID, itemSubClassID
         local _, _, _, itemEquipLoc, _, itemClassID = GetItemInfoInstant(itemLink)
 
-        if itemEquipLoc and itemEquipLoc ~= "" then
+        if itemEquipLoc and not itemEquipLoc:find("^INVTYPE_NON_EQUIP") then
             -- if not tContains({2, 4}, itemClassID) then
             -- 	buttonFontString:SetText("")
             -- 	return
