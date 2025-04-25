@@ -1,8 +1,8 @@
-## Interface: 110002
+## Interface: 110105
 ## Title: Durability And ItemLevel
 ## Notes: Minimalist durability and item level on each slot in character frame.
 ## Notes-zhCN: 角色面板耐久度&物品等级显示
-## Version: 3.9.2
+## Version: 3.9.3
 ## Author: enderneko
 ## SavedVariables: DurabilityAndItemLevel
 
