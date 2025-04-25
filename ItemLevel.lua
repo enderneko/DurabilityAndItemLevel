@@ -1,12 +1,12 @@
 local DAI = select(2, ...)
 --------------------------------------------------------------------------------
 -- ItemLevel strings
--- fyhcslb
 --------------------------------------------------------------------------------
 
 local GetItemInfo = C_Item.GetItemInfo
 local GetItemStats = C_Item.GetItemStats
 local GetItemInfoInstant = C_Item.GetItemInfoInstant
+local GetItemQualityColor = C_Item.GetItemQualityColor
 
 local slotFontStrings = {}
 DAI.ilvlFontStrings = slotFontStrings
@@ -204,20 +204,20 @@ local function ConvertRGBToHEX(r, g, b)
 end
 
 function DAI.GetItemInfo(itemLink, iLevel, checkEnchant)
-    -- local iQualityColor = select(4, GetItemQualityColor(GetInventoryItemQuality("player", slotID)))
-    -- https://wowpedia.fandom.com/wiki/ItemLink
+    -- https://warcraft.wiki.gg/wiki/ItemLink
     -- item : itemID : enchantID : gemID1 : gemID2 : gemID3 : gemID4 : suffixID : uniqueID : linkLevel : specializationID : modifiersMask : itemContext : numBonusIDs[:bonusID1:bonusID2:...] : numModifiers[:modifierType1:modifierValue1:...] : relic1NumBonusIDs[:relicBonusID1:relicBonusID2:...] : relic2NumBonusIDs[...] : relic3NumBonusIDs[...] : crafterGUID : extraEnchantID
-    local iQualityColor, itemString = itemLink:match("(|c%w+)|Hitem:(.+)|h%[.*%]|h|r")
+    local quality, itemString = itemLink:match("|cnIQ(%d):|Hitem:(.+)|h%[.*%]|h|r")
 
     local s
     if DurabilityAndItemLevel["customIlvlColor"][1] then
         s = "|cff" .. ConvertRGBToHEX(unpack(DurabilityAndItemLevel["customIlvlColor"][2])) .. iLevel
     else
-        s = iQualityColor .. iLevel
+        quality = select(4, GetItemQualityColor(quality))
+        s = "|c" .. quality .. iLevel
     end
 
     -- gem & enchant
-    if iLevel >= 171 then -- don't check old items
+    if iLevel >= 600 then -- don't check old items
         local itemStats = GetItemStats(itemLink)
         local g = 1
         local e = 1
@@ -226,7 +226,7 @@ function DAI.GetItemInfo(itemLink, iLevel, checkEnchant)
             local gem = select(3, string.split(":", itemString))
             if gem == "" then g = 0 end
         end
-        table.wipe(itemStats)
+        wipe(itemStats)
 
         if checkEnchant then
             local enchant = select(2, strsplit(":", itemString))
