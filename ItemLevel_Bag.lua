@@ -1,11 +1,11 @@
 local DAI = select(2, ...)
 --------------------------------------------------------------------------------
 -- ItemLevel strings
--- fyhcslb
 --------------------------------------------------------------------------------
 
 local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
 local GetItemInfoInstant = C_Item.GetItemInfoInstant
+local GetContainerItemLink = C_Container.GetContainerItemLink
 
 local bagFontStrings = {}
 DAI.bagFontStrings = bagFontStrings
@@ -32,7 +32,7 @@ local function UpdateButton(button, bag, slot)
     if not DurabilityAndItemLevel["showInBags"] then return end
 
     local buttonFontString = GetButtonFontString(button)
-    local itemLink = C_Container.GetContainerItemLink(bag, slot)
+    local itemLink = GetContainerItemLink(bag, slot)
 
     local s = ""
     if itemLink then  -- has item
@@ -131,6 +131,11 @@ frame:SetScript("OnEvent", function()
             if not button.isBag then
                 UpdateButton(button, -1, button:GetID())
             end
+        end)
+
+        -- account bank
+        hooksecurefunc(BankPanelItemButtonMixin, "Refresh", function(button)
+            UpdateButton(button, button:GetBankTabID(), button:GetContainerSlotID())
         end)
     end
 end)

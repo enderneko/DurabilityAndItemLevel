@@ -7,6 +7,10 @@ local GetItemInfo = C_Item.GetItemInfo
 local GetItemStats = C_Item.GetItemStats
 local GetItemInfoInstant = C_Item.GetItemInfoInstant
 local GetItemQualityColor = C_Item.GetItemQualityColor
+local GetContainerItemLink = C_Container.GetContainerItemLink
+local GetInventoryItem = C_TooltipInfo.GetInventoryItem
+local GetBagItem = C_TooltipInfo.GetBagItem
+local BankButtonIDToInvSlotID = BankButtonIDToInvSlotID
 
 local slotFontStrings = {}
 DAI.ilvlFontStrings = slotFontStrings
@@ -141,18 +145,18 @@ function DAI.GetItemLevelFromTooltip(slot, bag)
     -- use scanner
     -- DAI_Scanner:SetOwner(WorldFrame, "ANCHOR_NONE")
     if bag then
-        ilvl = select(4, GetItemInfo(C_Container.GetContainerItemLink(bag, slot))) or 0
+        ilvl = select(4, GetItemInfo(GetContainerItemLink(bag, slot))) or 0
         if bag == -1 then
             -- DAI_Scanner:SetInventoryItem("player", BankButtonIDToInvSlotID(slot, nil))
-            tooltipData = C_TooltipInfo.GetInventoryItem("player", BankButtonIDToInvSlotID(slot, nil))
+            tooltipData = GetInventoryItem("player", BankButtonIDToInvSlotID(slot, nil))
         else
             -- DAI_Scanner:SetBagItem(bag, slot)
-            tooltipData = C_TooltipInfo.GetBagItem(bag, slot)
+            tooltipData = GetBagItem(bag, slot)
         end
     else
         ilvl = select(4, GetItemInfo(GetInventoryItemLink("player", slot))) or 0
         -- DAI_Scanner:SetInventoryItem("player", slot)
-        tooltipData = C_TooltipInfo.GetInventoryItem("player", slot)
+        tooltipData = GetInventoryItem("player", slot)
     end
 
     -- for i = 2, DAI_Scanner:NumLines() do
