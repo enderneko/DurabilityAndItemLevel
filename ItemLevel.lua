@@ -119,17 +119,23 @@ local slotIDs = { -- http://wowprogramming.com/docs/api_types#inventoryID
 --     [73] = {},
 -- }
 
-local function GetSlotFontString(id, slot)
-    if(not slotFontStrings[id]) then
-        if not slot then -- not flyout button
-            slot = _G["Character" .. slotIDs[id]]
-        end
-        slotFontStrings[id] = slot:CreateFontString(nil, "OVERLAY")
-
-        slotFontStrings[id]:SetFont(unpack(DAI.GetFont()))
-        slotFontStrings[id]:SetPoint(unpack(DurabilityAndItemLevel["ilvlPoint"]))
+local function GetSlotFontString(isInspect, id, button)
+    local slot
+    if button then
+        slot = button
+    elseif isInspect then
+        slot = _G["Inspect" .. slotIDs[id]]
+    else
+        slot = _G["Character" .. slotIDs[id]]
     end
-    return slotFontStrings[id]
+
+    if not slotFontStrings[slot] then
+        slotFontStrings[slot] = slot:CreateFontString(nil, "OVERLAY")
+
+        slotFontStrings[slot]:SetFont(unpack(DAI.GetFont()))
+        slotFontStrings[slot]:SetPoint(unpack(DurabilityAndItemLevel["ilvlPoint"]))
+    end
+    return slotFontStrings[slot]
 end
 
 -- CreateFrame("GameTooltip", "DAI_Scanner", WorldFrame, "GameTooltipTemplate")
@@ -138,7 +144,7 @@ end
 local S_ITEM_LEVEL = "^" .. string.gsub(_G.ITEM_LEVEL, "%%d", "(%%d+)")
 
 -- should not use itemLink, may contain inaccurate data
-function DAI.GetItemLevelFromTooltip(slot, bag)
+function DAI.GetItemLevelFromTooltip(isInspect, slot, bag)
     local ilvl, scanedIlvl = 0
     local tooltipData
 
@@ -154,9 +160,10 @@ function DAI.GetItemLevelFromTooltip(slot, bag)
             tooltipData = GetBagItem(bag, slot)
         end
     else
-        ilvl = select(4, GetItemInfo(GetInventoryItemLink("player", slot))) or 0
-        -- DAI_Scanner:SetInventoryItem("player", slot)
-        tooltipData = GetInventoryItem("player", slot)
+        local target = isInspect and "target" or "player"
+        ilvl = select(4, GetItemInfo(GetInventoryItemLink(target, slot))) or 0
+        -- DAI_Scanner:SetInventoryItem(target, slot)
+        tooltipData = GetInventoryItem(target, slot)
     end
 
     -- for i = 2, DAI_Scanner:NumLines() do
@@ -252,8 +259,8 @@ end
 
 -- local requireGatheringEnchant, isPrimaryStatStrength
 local checkedSlots = {5, 7, 8, 9, 11, 12, 15, 16} -- chest, legs, feet, wrist, fingers, back, mainhand
-local function Update(slotID, itemLink, flyoutButton, flyoutButtonID, flyoutBag, flyoutSlot)
-    local slotFontString = GetSlotFontString(slotID, flyoutButton)
+local function Update(isInspect, slotID, itemLink, flyoutButton, flyoutButtonID, flyoutBag, flyoutSlot)
+    local slotFontString = GetSlotFontString(isInspect, slotID, flyoutButton)
 
     -- if slot is ignored, also hide on its flyouts
     if flyoutButtonID and not slotIDs[flyoutButtonID] then
@@ -269,10 +276,10 @@ local function Update(slotID, itemLink, flyoutButton, flyoutButtonID, flyoutBag,
         -- forceTooltip or isArtifactWeapon Legion
         -- if DurabilityAndItemLevel["forceTooltip"] or ((slotID == 16 or slotID == 17) and select(3, GetItemInfo(itemLink)) == 6) then -- GetInventoryItemQuality("player", slotID) == 6
         if flyoutBag and flyoutSlot then
-            iLevel = DAI.GetItemLevelFromTooltip(flyoutSlot, flyoutBag)
+            iLevel = DAI.GetItemLevelFromTooltip(false, flyoutSlot, flyoutBag)
         else
             if flyoutSlot then slotID = flyoutSlot end -- flyoutBag == nil, it's an equipped item. Rings, Trinkets, Single-hand Weapons...
-            iLevel = DAI.GetItemLevelFromTooltip(slotID)
+            iLevel = DAI.GetItemLevelFromTooltip(isInspect, slotID)
         end
 
         if iLevel then
@@ -314,12 +321,18 @@ local function UpdateFlyout(button)
 
     -- button.id: invertoryID (slotID)
     -- button:GetName() -> EquipmentFlyoutFrameButton1 ...
-    Update(button:GetName(), itemLink, button, button.id, bag, slot)
+    Update(false, button:GetName(), itemLink, button, button.id, bag, slot)
 end
 
-function DAI.UpdateAllIlvl()
+function DAI.UpdatePlayer()
     for id, _ in pairs(slotIDs) do
-        Update(id, GetInventoryItemLink("player", id))
+        Update(false, id, GetInventoryItemLink("player", id))
+    end
+end
+
+function DAI.UpdateInspect()
+    for id, _ in pairs(slotIDs) do
+        Update(true, id, GetInventoryItemLink("target", id))
     end
 end
 
@@ -344,8 +357,29 @@ end
 
 local f = CreateFrame("Frame")
 f:RegisterEvent("PLAYER_ENTERING_WORLD")
+f:RegisterEvent("ADDON_LOADED")
 -- f:RegisterEvent("SKILL_LINES_CHANGED")
 -- f:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
+
+local function CheckEventRegistration()
+    local characterShown, inspectShown
+
+    if CharacterFrame and CharacterFrame:IsShown() then
+        f:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
+        characterShown = true
+    else
+        f:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
+        characterShown = false
+    end
+
+    inspectShown = InspectFrame and InspectFrame:IsShown()
+
+    if characterShown or inspectShown then
+        f:RegisterEvent("UNIT_INVENTORY_CHANGED")
+    else
+        f:UnregisterEvent("UNIT_INVENTORY_CHANGED")
+    end
+end
 
 f:SetScript("OnEvent", function(self, event, arg1)
     if event == "PLAYER_ENTERING_WORLD" then
@@ -355,17 +389,13 @@ f:SetScript("OnEvent", function(self, event, arg1)
         -- UpdatePrimaryStat()
 
         CharacterFrame:HookScript("OnShow", function()
-            f:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
-            f:RegisterEvent("UNIT_INVENTORY_CHANGED")
+            CheckEventRegistration()
             C_Timer.After(0.1, function()
-                DAI.UpdateAllIlvl()
+                DAI.UpdatePlayer()
             end)
         end)
 
-        CharacterFrame:HookScript("OnHide", function()
-            f:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
-            f:UnregisterEvent("UNIT_INVENTORY_CHANGED")
-        end)
+        CharacterFrame:HookScript("OnHide", CheckEventRegistration)
 
         -- Interface\FrameXML\EquipmentFlyout.lua
         hooksecurefunc("EquipmentFlyout_DisplayButton", function(button)
@@ -381,13 +411,31 @@ f:SetScript("OnEvent", function(self, event, arg1)
     elseif event == "UNIT_INVENTORY_CHANGED" then
         if arg1 == "player" then
             C_Timer.After(0.1, function()
-                DAI.UpdateAllIlvl()
+                DAI.UpdatePlayer()
+            end)
+        elseif arg1 == "target" and InspectFrame and InspectFrame:IsShown() then
+            C_Timer.After(0.5, function()
+                DAI.UpdateInspect()
             end)
         end
     elseif event == "PLAYER_EQUIPMENT_CHANGED" then
         if slotIDs[arg1] then
-            Update(arg1, GetInventoryItemLink("player", arg1))
+            Update(false, arg1, GetInventoryItemLink("player", arg1))
         end
 
+    elseif event == "ADDON_LOADED" then
+        if arg1 == "Blizzard_InspectUI" then
+            InspectFrame:HookScript("OnShow", function()
+                CheckEventRegistration()
+                C_Timer.After(0.5, function()
+                    DAI.UpdateInspect()
+                end)
+            end)
+            -- hooksecurefunc("InspectFrame_UpdateTabs", function()
+            --     C_Timer.After(0.1, function()
+            --         print("UPDATE")
+            --     end)
+            -- end)
+        end
     end
 end)

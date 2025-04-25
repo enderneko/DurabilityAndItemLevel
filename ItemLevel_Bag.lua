@@ -48,7 +48,7 @@ local function UpdateButton(button, bag, slot)
             -- end
 
             -- get ilvl
-            iLevel = DAI.GetItemLevelFromTooltip(slot, bag)
+            iLevel = DAI.GetItemLevelFromTooltip(false, slot, bag)
 
             if iLevel and iLevel >= DurabilityAndItemLevel["iThreshold"] then
                 local checkEnchant = false
