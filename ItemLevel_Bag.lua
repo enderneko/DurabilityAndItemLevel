@@ -127,11 +127,11 @@ frame:SetScript("OnEvent", function()
         hooksecurefunc(ContainerFrameCombinedBags, "UpdateItems", UpdateItems)
 
         -- blizzard bank bags
-        hooksecurefunc("BankFrameItemButton_Update", function(button)
-            if not button.isBag then
-                UpdateButton(button, -1, button:GetID())
-            end
-        end)
+        -- hooksecurefunc("BankFrameItemButton_Update", function(button)
+        --     if not button.isBag then
+        --         UpdateButton(button, -1, button:GetID())
+        --     end
+        -- end)
 
         -- account bank
         hooksecurefunc(BankPanelItemButtonMixin, "Refresh", function(button)
